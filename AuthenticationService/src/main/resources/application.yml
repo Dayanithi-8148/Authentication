@@ -1,0 +1,28 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:sqlite:authz.db
+    driver-class-name: org.sqlite.JDBC
+    initialization-mode: always
+    schema: classpath:schema.sql
+    data: classpath:data.sql
+  sql:
+    init:
+      mode: always
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000, expireAfterWrite=1h
+
+# REPLACE WITH YOUR ACTUAL AUTH0 VALUES
+auth0:
+  issuer: https://dev-b41q6birjs2bsosm.us.auth0.com/  # Must include trailing slash
+  audience: https://api.authz-service.com
+  userIdClaim: https://api.authz-service.com/user_id
+
+logging:
+  level:
+    org.springframework: DEBUG
+    com.example.authz: DEBUG
