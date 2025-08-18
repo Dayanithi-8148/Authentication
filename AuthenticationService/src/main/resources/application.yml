@@ -17,7 +17,7 @@ spring:
       spec: maximumSize=1000, expireAfterWrite=1h
 
 auth0:
-  issuer: https://dev-b41q6birjs2bsosm.us.auth0.com/  
+  issuer: https://dev-b41q6birjs2bsosm.us.auth0.com/
   audience: https://api.authz-service.com
   userIdClaim: https://api.authz-service.com/user_id
 
