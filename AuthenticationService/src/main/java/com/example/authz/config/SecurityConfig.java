@@ -14,20 +14,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Disable CSRF (cross-site request forgery) since we're using JWT
                 .csrf(csrf -> csrf.disable())
 
-                // Set session management to stateless (no sessions)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                // Configure authorization rules
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoint
                         .requestMatchers("/authorize").permitAll()
-
-                        // All other endpoints require authentication
                         .anyRequest().authenticated()
                 );
 

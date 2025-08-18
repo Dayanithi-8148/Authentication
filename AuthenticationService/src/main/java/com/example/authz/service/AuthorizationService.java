@@ -24,21 +24,17 @@ public class AuthorizationService {
 
     public AuthorizationResponse authorize(AuthorizationRequest request) {
         try {
-            // Validate token and extract user ID
             String userId = jwtService.validateAndExtractUserId(request.getAccess_token());
             logger.debug("Authorizing request for user: {}", userId);
 
-            // Map HTTP method to action
             String action = mapMethodToAction(request.getMethod());
             String resource = normalizePath(request.getPath());
 
             logger.debug("Action: {}, Resource: {}", action, resource);
 
-            // Retrieve permissions for this user/action
             List<Permission> permissions = permissionService.findPermissions(userId, action);
             logger.debug("Found {} permissions for user: {}", permissions.size(), userId);
 
-            // Find matching permissions
             List<Permission> matchingPermissions = findMatchingPermissions(permissions, resource);
 
             if (matchingPermissions.isEmpty()) {
@@ -46,14 +42,12 @@ public class AuthorizationService {
                 return buildDenyResponse(userId, "No matching permissions found");
             }
 
-            // Separate allow and deny permissions
             Map<Boolean, List<Permission>> groupedByEffect = matchingPermissions.stream()
                     .collect(Collectors.groupingBy(p -> "deny".equalsIgnoreCase(p.getEffect())));
 
             List<Permission> denyPermissions = groupedByEffect.getOrDefault(true, Collections.emptyList());
             List<Permission> allowPermissions = groupedByEffect.getOrDefault(false, Collections.emptyList());
 
-            // Deny takes precedence
             if (!denyPermissions.isEmpty()) {
                 Permission mostSpecificDeny = findMostSpecificPermission(denyPermissions, resource);
                 logger.info("DENY: Explicit deny for user {} on {} {} (matched: {})",
@@ -61,7 +55,6 @@ public class AuthorizationService {
                 return buildDenyResponse(userId, "Explicit deny on resource: " + mostSpecificDeny.getResource());
             }
 
-            // Find most specific allow permission
             Permission mostSpecificAllow = findMostSpecificPermission(allowPermissions, resource);
             logger.info("ALLOW: User {} granted {} on {} (matched: {})",
                     userId, action, resource, mostSpecificAllow.getResource());

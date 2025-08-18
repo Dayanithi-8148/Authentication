@@ -28,18 +28,16 @@ public class JwtService {
     public JwtService(JwtConfig jwtConfig) {
         this.jwtConfig = jwtConfig;
 
-        // Normalize issuer URL (ensure it ends with '/')
         String issuerUrl = jwtConfig.getIssuer();
         if (!issuerUrl.endsWith("/")) {
             issuerUrl += "/";
         }
 
         try {
-            // Create JWK provider with caching
             this.jwkProvider = new UrlJwkProvider(
                     new URL(issuerUrl + ".well-known/jwks.json"),
-                    (int) TimeUnit.SECONDS.toMillis(10),   // Connect timeout
-                    (int) TimeUnit.SECONDS.toMillis(10)    // Read timeout
+                    (int) TimeUnit.SECONDS.toMillis(10),
+                    (int) TimeUnit.SECONDS.toMillis(10)
             );
         } catch (Exception e) {
             throw new RuntimeException("Failed to create JWK provider: " + e.getMessage(), e);
@@ -52,30 +50,24 @@ public class JwtService {
         }
 
         try {
-            // 1. Decode token to get header without verification
             DecodedJWT jwt = JWT.decode(token);
 
-            // 2. Get key ID from token header
             String keyId = jwt.getKeyId();
             if (keyId == null) {
                 throw new JWTVerificationException("Token does not contain key ID (kid)");
             }
 
-            // 3. Get public key from JWKS endpoint
             Jwk jwk = jwkProvider.get(keyId);
             RSAPublicKey publicKey = (RSAPublicKey) jwk.getPublicKey();
 
-            // 4. Create algorithm and verifier
             Algorithm algorithm = Algorithm.RSA256(publicKey, null);
             JWTVerifier verifier = JWT.require(algorithm)
                     .withIssuer(jwtConfig.getIssuer())
                     .withAudience(jwtConfig.getAudience())
                     .build();
 
-            // 5. Verify token (signature, expiration, etc.)
             jwt = verifier.verify(token);
 
-            // 6. Extract user ID from custom claim
             String userId = jwt.getClaim(jwtConfig.getUserIdClaim()).asString();
             if (userId == null || userId.isBlank()) {
                 throw new JWTVerificationException("User ID claim is missing or empty");

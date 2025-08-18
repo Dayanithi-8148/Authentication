@@ -16,9 +16,8 @@ spring:
     caffeine:
       spec: maximumSize=1000, expireAfterWrite=1h
 
-# REPLACE WITH YOUR ACTUAL AUTH0 VALUES
 auth0:
-  issuer: https://dev-b41q6birjs2bsosm.us.auth0.com/  # Must include trailing slash
+  issuer: https://dev-b41q6birjs2bsosm.us.auth0.com/  
   audience: https://api.authz-service.com
   userIdClaim: https://api.authz-service.com/user_id
 
