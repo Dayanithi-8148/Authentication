@@ -48,7 +48,7 @@ Key features:
 * Postman (for testing)
 
 
-# Auth0 Configuration <a name="auth0-configuration"></a>
+# Auth0 Configuration 
 
 1. Create Tenant
    Go to Auth0 and sign up
@@ -170,7 +170,7 @@ yaml
         userIdClaim: ${AUTH0_USER_ID_CLAIM}
 
 
-# Database Setup <a name="database-setup"></a>
+# Database Setup 
 
 1. The service uses SQLite with auto-initialization:
 
@@ -199,8 +199,7 @@ Data (data.sql)
         ('admin789', 'write', '**', 'allow'),
         ('admin789', 'delete', '**', 'allow');
 
-# Running the Application <a name="running-the-application"></a>
-
+# Running the Application 
 
 Step 1: 
 
